@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logged In</title>
+</head>
+<body>
+    <h1>Welcome to Your Account {{name}}!</h1>
+    <label>Your email is: {{email}}</label><br><br>
+    <label>Your name is: {{name}}</label><br><br>
+    <a href="/">Go to Home Page</a>
+    {% if session.get('logged_in') %}
+        <br><a href="/logout">Logout</a>
+    {% endif %}
+</body>
+</html>

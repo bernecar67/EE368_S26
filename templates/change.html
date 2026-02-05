@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Change Password</title>
+    <style>
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
+    <script>
+    function toggle(cb) {
+        const input = cb.previousElementSibling;
+        if (!input) return;
+        input.type = (input.type === "password") ? "text" : "password";
+    }
+    </script>
+</head>
+<body>
+    <h1>Change Password</h1>
+    <form action="/change" method="post">
+        {% if errors.email %}
+            <div class="error">{{ errors.email }}</div>
+        {% endif %}
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email"><br><br>
+        
+        {% if errors.currentPassword %}
+            <div class="error">{{ errors.currentPassword }}</div>
+        {% endif %}
+        <label for="currentPassword">Current Password:</label>
+        <input type="password" id="currentPassword" name="currentPassword" required>
+        <input type="checkbox" onclick="toggle(this)"> Show Password<br><br>
+        
+        {% if errors.newPassword %}
+            <div class="error">{{ errors.newPassword }}</div>
+        {% endif %}
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" name="newPassword" required>
+        <input type="checkbox" onclick="toggle(this)"> Show Password<br><br>
+
+        {% if errors.confirmPassword %}
+            <div class="error">{{ errors.confirmPassword }}</div>
+        {% endif %}
+        <label for="confirmPassword">Confirm New Password:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required>
+        <input type="checkbox" onclick="toggle(this)"> Show Password<br><br>
+
+        <button type="submit">Change Password</button>
+    </form>
+    <br><a href="/">Go to Home Page</a>
+    {% if session.get('logged_in') %}
+        <br><a href="/logout">Logout</a>
+    {% endif %}
+</body>
+</html>

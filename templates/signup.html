@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up Page</title>
+    <style>
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
+    <script>
+        function toggle() {
+            const passwordInput = document.getElementById("password");
+            passwordInput.type =
+                passwordInput.type === "password" ? "text" : "password";
+        }
+    </script>
+</head>
+<body>
+    <h1>Sign Up Page</h1>
+    <form action="/signup" method="post">
+        {% if errors.fname %}
+            <div class="error">{{ errors.fname }}</div>
+        {% endif %}
+        <label for="fname">First Name:</label>
+        <input type="text" id="fname" name="fname"><br><br>
+
+        {% if errors.lname %}
+            <div class="error">{{ errors.lname }}</div>
+        {% endif %}
+        <label for="lname">Last Name:</label>
+        <input type="text" id="lname" name="lname"><br><br>
+
+        {% if errors.email %}
+            <div class="error">{{ errors.email }}</div>
+        {% endif %}
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email"><br><br>
+
+        {% if errors.password %}
+            <div class="error">{{ errors.password }}</div>
+        {% endif %}
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <input type="checkbox" onclick="toggle()"> Show Password<br><br>
+
+        <input type="submit" value="Sign Up">
+    </form>
+    {% if errors.email %}
+        <form action="/login" method="get">
+            <br><input type="submit" value="Go to Login Page">
+        </form>
+    {% endif %}
+    <br><a href="/">Go to Home Page</a>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home Page</title>
+    <style>
+        .success {
+            color: rgb(37, 102, 0);
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Home Page</h1>
+    {% if not session.get('logged_in') %}
+        <a href="/login">Login</a> | <a href="/signup">Sign Up</a>
+    {% endif %}
+
+    {% if session.get('logged_in') %}
+        <label>Please logout before signing in again or signing up.</label>
+        <br><a href="/logout">Logout</a>
+    {% endif %}
+</body>
+</html>
