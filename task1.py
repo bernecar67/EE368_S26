@@ -87,6 +87,23 @@ def logout():
     session.clear()
     return redirect(url_for('home'))
 
+# Vaidate Password Function
+def validate_password(password):
+    if len(password) < 6:
+        return "Password must be at least 6 characters long."
+    elif not any(char.isdigit() for char in password):
+        return "Password must contain at least one number."
+    elif not any(char.isupper() for char in password):
+        return "Password must contain at least one uppercase letter."
+    elif not any(char.islower() for char in password):
+        return "Password must contain at least one lowercase letter."
+    elif not any(char in "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~" for char in password):
+        return "Password must contain at least one special character."
+    elif ' ' in password:
+        return "Password must not contain spaces."
+    else:
+        return None
+
 # Signup page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -113,23 +130,15 @@ def signup():
             errors["password"] = "Password is required."
 
         # Password, name, and email requirements
+        errors["password"] = validate_password(password)
+
         if not errors:
             check_query = "SELECT * FROM login_info WHERE email = %s"
             cursor.execute(check_query, (email,))
             if cursor.fetchone():
                 errors["email"] = "Account with this email already exists. Please log in."
-            elif len(password) < 6:
-                errors["password"] = "Password must be at least 6 characters long."
-            elif not any(char.isdigit() for char in password):
-                errors["password"] = "Password must contain at least one number."
-            elif not any(char.isupper() for char in password):
-                errors["password"] = "Password must contain at least one uppercase letter."
-            elif not any(char.islower() for char in password):
-                errors["password"] = "Password must contain at least one lowercase letter."
-            elif not any(char in "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~" for char in password):
-                errors["password"] = "Password must contain at least one special character."
-            elif ' ' in password:
-                errors["password"] = "Password must not contain spaces."
+            elif errors.get("password"):
+                pass
             elif fname.isdigit() or lname.isdigit():
                 errors["name"] = "Names cannot contain numbers."
             elif not any("@" in email and "." in email for char in email):
@@ -172,20 +181,7 @@ def change_page():
             errors["currentPassword"] = "Current password is incorrect."
 
         # Validate new password
-        if not new_password:
-            errors["newPassword"] = "New password is required."
-        elif len(new_password) < 6:
-            errors["newPassword"] = "New password must be at least 6 characters long."
-        elif not any(char.isdigit() for char in new_password):
-            errors["newPassword"] = "New password must contain at least one number."
-        elif not any(char.isupper() for char in new_password):
-            errors["newPassword"] = "New password must contain at least one uppercase letter."
-        elif not any(char.islower() for char in new_password):
-            errors["newPassword"] = "New password must contain at least one lowercase letter."
-        elif not any(char in "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~" for char in new_password):
-            errors["newPassword"] = "New password must contain at least one special character."
-        elif ' ' in new_password:
-            errors["newPassword"] = "New password must not contain spaces."
+        errors["newPassword"] = validate_password(new_password)
 
         if confirm_password != new_password:
             errors["confirmPassword"] = "Passwords do not match."
