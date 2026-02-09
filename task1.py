@@ -101,8 +101,6 @@ def validate_password(password):
         return "Password must contain at least one special character."
     elif ' ' in password:
         return "Password must not contain spaces."
-    else:
-        return None
 
 # Signup page
 @app.route('/signup', methods=['GET', 'POST'])
@@ -130,7 +128,9 @@ def signup():
             errors["password"] = "Password is required."
 
         # Password, name, and email requirements
-        errors["password"] = validate_password(password)
+        passwordErrors = validate_password(password)
+        if passwordErrors:
+            errors["password"] = passwordErrors
 
         if not errors:
             check_query = "SELECT * FROM login_info WHERE email = %s"
@@ -181,7 +181,9 @@ def change_page():
             errors["currentPassword"] = "Current password is incorrect."
 
         # Validate new password
-        errors["newPassword"] = validate_password(new_password)
+        newPasswordErrors = validate_password(new_password)
+        if newPasswordErrors:
+            errors["newPassword"] = newPasswordErrors
 
         if confirm_password != new_password:
             errors["confirmPassword"] = "Passwords do not match."
