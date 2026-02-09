@@ -4,6 +4,7 @@ import bcrypt
 
 app = Flask(__name__)
 app.secret_key = 'my_secret_key'
+salt = bcrypt.gensalt()
 
 try:
     # Database connection (change password as needed)
@@ -101,7 +102,7 @@ def validate_password(password):
         return "Password must contain at least one special character."
     elif ' ' in password:
         return "Password must not contain spaces."
-
+    
 # Signup page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -146,7 +147,7 @@ def signup():
             else:
                 name = fname + " " + lname
                 # Hash the password
-                hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+                hashed_pw = bcrypt.hashpw(password.encode('utf-8'), salt)
 
                 insert_query = "INSERT INTO login_info (email, password, name) VALUES (%s ,%s, %s)"
                 cursor.execute(insert_query, (email, hashed_pw, name))
@@ -174,10 +175,10 @@ def change_page():
         check_query = "SELECT * FROM login_info WHERE email = %s"
         cursor.execute(check_query, (email,))
         result = cursor.fetchone()
-
+    
         if not result:
             errors["email"] = "User not found."
-        elif current_password != result[1]:
+        elif not bcrypt.checkpw(current_password.encode('utf-8'), result[1].encode('utf-8')):
             errors["currentPassword"] = "Current password is incorrect."
 
         # Validate new password
@@ -189,10 +190,11 @@ def change_page():
             errors["confirmPassword"] = "Passwords do not match."
 
         if not errors:
+            hashed_pw = bcrypt.hashpw(new_password.encode('utf-8'), salt)
             update_query = "UPDATE login_info SET password=%s WHERE email=%s"
-            cursor.execute(update_query, (new_password, email))
+            cursor.execute(update_query, (hashed_pw, email))
             conn.commit()
-            return "Password changed successfully."
+            return redirect(url_for('home'))
 
     return render_template("change.html", errors=errors)
 
