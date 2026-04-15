@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logged In</title>
+    <style>
+        .footer { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            text-align: center; 
+            background: #eee; 
+            padding: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Your Account {{name}}!</h1>
+    <label>Your email is: {{email}}</label><br><br>
+    <label>Your name is: {{name}}</label><br><br>
+    <div class="footer">
+        <a href="/">Go to Home Page</a>
+    </div>
+    <a href="/logout">Logout</a>
+</body>
+</html>
