@@ -236,7 +236,6 @@ def change_page():
         new_password = request.form['newPassword']
         confirm_password = request.form['confirmPassword']
         
-
         check_query = "SELECT * FROM login_info WHERE email = %s"
         cursor.execute(check_query, (email,))
         result = cursor.fetchone()
