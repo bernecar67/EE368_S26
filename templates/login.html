@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page </title>
+    <style>
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+        .footer { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            text-align: center; 
+            background: #eee; 
+            padding: 10px; 
+        }
+    </style>
+    <script>
+        function toggle() {
+            const passwordInput = document.getElementById("password");
+            passwordInput.type =
+                passwordInput.type === "password" ? "text" : "password";
+        }
+    </script>
+</head>
+<body>
+    <h1>Login Page</h1>
+    <form action="/login" method="post">
+        {% if errors.email %}
+            <div class="error">
+                Email is not registered. Please sign up 
+                <a href="/signup">{{ errors.email }}</a>
+            </div>
+        {% endif %}
+        {% if errors.blankemail %}
+            <div class="error">{{ errors.blankemail }}</div>
+        {% endif %}
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email"><br><br>
+
+        {% if errors.password %}
+            <div class="error">{{ errors.password }}</div>
+        {% endif %}
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <input type="checkbox" onclick="toggle()"> Show Password<br><br>
+
+        <input type="submit" value="Login">
+    </form>
+    <form action="/change" method="get">
+        <br><input type="submit" value="Go to Change Password Page">
+    </form>
+    {%if errors.oauth %}
+        <div class="error">{{ errors.oauth }}</div>
+    {% endif %}
+    <br><a href="/google">Login with Google</a> | <a href="/">Login with GitHub</a> | <a href="/custom">Login with Custom OAuth</a>
+    <div class="footer">
+        <a href="/">Go to Home Page</a>
+    </div>
+</body>
+</html>
