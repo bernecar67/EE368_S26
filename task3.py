@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+import mysql.connector
+import bcrypt
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
 import os
-import mysql.connector
-import bcrypt
 import requests
 
 load_dotenv()
@@ -75,6 +75,7 @@ def home():
 def login():
     errors = {}
 
+    # Check for OAuth error messages and pass them to the template
     oauth_error = request.args.get('oauth_error')
     if oauth_error:
         errors["oauth"] = oauth_error
@@ -116,7 +117,9 @@ def logged_in():
     user = session.get('user')
 
     # Redirect to home if not logged in
+    # First if statement checks if user is logged in through traditional login
     if not session.get('logged_in'):
+        # Second if statement checks if user is logged in through OAuth (i.e., user info stored in session)
         if user:
             return render_template('loggedIn.html', name=user['name'], email=user['email'])
         else:
@@ -134,7 +137,7 @@ def google_redirect():
    except requests.exceptions.ConnectionError:
         return redirect(url_for('login', oauth_error="Connection error. Please try again."))
    except Exception as e:
-       return redirect(url_for('login', oauth_error=f"Error connecting to Google. {e}"))
+       return redirect(url_for('login', oauth_error=f"Unexpected error occurred. Please see the following: {e}"))
 
 # Google OAuth callback
 @app.route('/login/google')
@@ -167,13 +170,14 @@ def custom_redirect():
    except requests.exceptions.ConnectionError:
         return redirect(url_for('login', oauth_error="Connection error. Please try again."))
    except Exception as e:
-       return redirect(url_for('login', oauth_error=f"Error connecting to Google. {e}"))
+       return redirect(url_for('login', oauth_error=f"Unexpected error occurred. Please see the following: {e}"))
 
 # Custom OAuth callback
 @app.route('/login/custom')
 def custom_authorize():
    # Error handling for authorization process (e.g., user denies access, invalid/expired token, network issues)
    try:
+       # Usage of the issue_token endpoint in route.py
        token = custom_oauth_server.authorize_access_token()
    except Exception as e:
        print(f"Error occurred while authorizing: {e}")
