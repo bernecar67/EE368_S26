@@ -36,12 +36,14 @@ class Config:
     # Error handling for database connection issues
     try:
         SQLALCHEMY_DATABASE_URI = os.environ.get(
-            'DATABASE_URI', 'mysql+mysqlconnector://root:MySQL26!@localhost/ee368_lab5'
+            # Replace with your actual database URI and password if not using environment variable
+            'DATABASE_URI', 'mysql+mysqlconnector://root:MySQL26!@localhost/ee368_oauth'
         )
     except Exception as e:
         print(f"Error occurred while connecting to database URI: {e}")
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    OAUTH2_TOKEN_EXPIRES_IN = 3600  # Token expiration time in seconds (1 hour)
 
 
 def create_app():

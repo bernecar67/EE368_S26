@@ -80,7 +80,8 @@ def userinfo():
     user = User.query.get(current_token.user_id)
     return jsonify({
         'name': user.name,
-        'email': user.email
+        'email': user.email,
+        'picture': 'https://upload.wikimedia.org/wikipedia/en/f/f1/Clarkson-seal.png'
     })
 
 

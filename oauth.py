@@ -40,9 +40,12 @@ class MyAuthorizationCodeGrant(grants.AuthorizationCodeGrant):
 
 class MyBearerTokenValidator(BearerTokenValidator):
     def authenticate_token(self, token_string):
-        # Retrieve the token from the database
-        return Token.query.filter_by(access_token=token_string).first()
-
+        # Retrieve the token from the database and check if it's valid and not expired
+        token = Token.query.filter_by(access_token=token_string).first()
+        if token and not token.is_expired():
+            return token
+        else:
+            return None
 
 # Allow insecure transport (http instead of https) for development purposes only
 os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -57,7 +60,6 @@ def configure_oauth(app):
         save_token=create_save_token_func(db.session, Token)
     )
     auth_server.register_grant(MyAuthorizationCodeGrant)
-    auth_server.register_token_generator('default', auth_server.create_bearer_token_generator(app.config))
-
+    auth_server.register_token_generator('default', auth_server.create_bearer_token_generator({'OAUTH2_TOKEN_EXPIRES_IN': {'authorization_code': 3600}}))
     # protect resource
     require_oauth.register_token_validator(MyBearerTokenValidator())
