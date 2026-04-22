@@ -27,6 +27,18 @@ google = oauth.register(
    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
 )
 
+# GitHub OAuth Setup
+oauth = OAuth(app)
+github = oauth.register(
+    name='github',
+    client_id=os.getenv('GITHUB_CLIENT_ID'),
+    client_secret=os.getenv('GITHUB_CLIENT_SECRET'),
+    access_token_url='https://github.com/login/oauth/access_token',
+    authorize_url='https://github.com/login/oauth/authorize',
+    api_base_url='https://api.github.com/',
+    client_kwargs={'scope': 'user:email'},
+)
+
 try:
     # Database connection (change password as needed)
     conn = mysql.connector.connect(
@@ -138,6 +150,39 @@ def authorize():
    # Error handling for fetching user info (e.g., network issues, authorization errors, API changes)
    try:
        resp = google.get('userinfo')
+   except Exception as e:
+       print(f"Error occurred while fetching user info: {e}")
+       return redirect(url_for('login'))
+   
+   user_info = resp.json()
+   session['user'] = user_info
+   return redirect('/loggedIn')
+
+# Github redirect to Github OAuth
+@app.route('/github')
+def github_redirect():
+   try:
+       return github.authorize_redirect(url_for('github_authorize', _external=True))
+   except requests.exceptions.Timeout:
+        return redirect(url_for('login', oauth_error="Connection timed out. Please try again."))
+   except requests.exceptions.ConnectionError:
+        return redirect(url_for('login', oauth_error="Connection error. Please try again."))
+   except Exception as e:
+       return redirect(url_for('login', oauth_error=f"Unexpected error occurred. Please see the following: {e}"))
+
+# Github OAuth callback
+@app.route('/login/github')
+def github_authorize():
+   # Error handling for authorization process (e.g., user denies access, invalid/expired token, network issues)
+   try:
+       token = github.authorize_access_token()
+   except Exception as e:
+       print(f"Error occurred while authorizing: {e}")
+       return redirect(url_for('login'))
+   
+   # Error handling for fetching user info (e.g., network issues, authorization errors, API changes)
+   try:
+       resp = github.get('user')
    except Exception as e:
        print(f"Error occurred while fetching user info: {e}")
        return redirect(url_for('login'))
